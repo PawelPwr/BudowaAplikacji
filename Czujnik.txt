@@ -1,25 +1,35 @@
+#include <OneWire.h>
+#include <DS18B20.h>
+
 #define MIN_VOLTAGE     600 // mv - próg dolnego zakresu napiêcia dla braku py³u
 #define VREF           5000 // mv - napiêcie referencyjne komparatora
 #define PIN_LED           7 // numer pinu ILED
 #define PIN_ANALOG        0 // numer pinu AOUT
 #define MAX_ITERS        10 // liczba pomiarow do sredniej
+#define ONEWIRE_PIN       2 // pin do termometru
+
  
 int ADC_VALUE; // odczytana wartosc A0
 int ITER; // numer pomiaru
 float VOLTAGE; // wartosc napiecia
 float DUST; // wynik
 float AVG_DUST; // sredni wynik
- 
-void setup(void)
+byte address[8] = {0x28, 0xFF, 0x4C, 0xFC, 0xB4, 0x16, 0x5, 0xB8}; // numer adres termometru
+
+OneWire onewire(ONEWIRE_PIN);
+DS18B20 sensors(&onewire);
+
+void setup()
 {
    
   Serial.begin(9600);
  
+
+  sensors.begin();
+  sensors.request(address);
 }
- 
 float computeDust()
 {
-
   ADC_VALUE = analogRead(PIN_ANALOG);
   digitalWrite(PIN_LED, LOW);
  
@@ -34,7 +44,7 @@ float computeDust()
   return 0;
 }
  
-void loop(void)
+void loop()
 {
    AVG_DUST = 0;
    ITER = 0;
@@ -57,4 +67,15 @@ void loop(void)
    Serial.println("ug/m3");    
  
    delay(500);
-}
+
+    if (sensors.available())
+  {
+    float temperature = sensors.readTemperature(address);
+    //TE(temperature);
+    Serial.print(temperature);
+    Serial.println(F(" 'C"));
+
+    sensors.request(address);
+  }
+    delay(500);
+  }
