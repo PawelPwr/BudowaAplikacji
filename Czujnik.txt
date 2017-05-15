@@ -1,5 +1,8 @@
 #include <OneWire.h>
 #include <DS18B20.h>
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(8,3,4,5,6,9); // piny do wyœwietlacza
 
 #define MIN_VOLTAGE     600 // mv - próg dolnego zakresu napiêcia dla braku py³u
 #define VREF           5000 // mv - napiêcie referencyjne komparatora
@@ -27,6 +30,14 @@ void setup()
 
   sensors.begin();
   sensors.request(address);
+
+  lcd.begin(16,2);
+  lcd.setCursor(0,0);
+  lcd.print("Witaj");
+  lcd.setCursor(0,1);
+  lcd.print("Start za 5 sek.");
+  delay(5000);
+  lcd.clear();
 }
 float computeDust()
 {
@@ -75,8 +86,18 @@ void loop()
     Serial.print(temperature);
     Serial.println(F(" 'C"));
 
+    lcd.setCursor(0,1);
+    lcd.print(temperature);
+    lcd.print(" 'C");
+
     sensors.request(address);
   }
     delay(500);
-  }
 
+    lcd.setCursor(0,0);
+    lcd.print("D = ");
+    lcd.print(AVG_DUST);
+    lcd.print("ug/m3");
+
+
+    
