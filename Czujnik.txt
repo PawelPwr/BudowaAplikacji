@@ -75,7 +75,13 @@ void loop()
    
    Serial.print("D = ");
    Serial.print(AVG_DUST);
-   Serial.println("ug/m3");    
+   Serial.println("ug/m3"); 
+
+      //alarm
+  if (AVG_DUST>250){
+    alarm();
+  }
+   
  
    delay(500);
 
@@ -101,3 +107,12 @@ void loop()
 
 
     
+  }
+
+  void alarm() {
+  pinMode(A5,OUTPUT);
+  tone(A5,4000);
+  delay(100);
+  noTone(A5);
+  delay(100);
+}
